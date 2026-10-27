@@ -3,84 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel</title>
+  <title>Admin Panel | Investment Dashboard</title>
   <style>
     :root {
-      --bg: #0b1220;
-      --panel: #111827;
-      --panel-soft: #172033;
-      --card: #1d2940;
-      --muted: #93a3b8;
-      --text: #edf2ff;
-      --primary: #4f8cff;
-      --primary-dark: #2d6cdf;
-      --success: #22c55e;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --border: rgba(255,255,255,0.08);
-      --shadow: 0 16px 30px rgba(0,0,0,0.25);
+      --bg: #07111f;
+      --bg-2: #0d1b2a;
+      --panel: rgba(15, 23, 42, 0.88);
+      --panel-strong: #111d2d;
+      --panel-soft: #16273d;
+      --card: rgba(19, 33, 53, 0.92);
+      --card-2: rgba(15, 23, 42, 0.72);
+      --line: rgba(148, 163, 184, 0.18);
+      --text: #edf5ff;
+      --text-soft: #a9bad0;
+      --primary: #5aa8ff;
+      --primary-2: #7c5cff;
+      --success: #2dd4bf;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #a78bfa;
+      --shadow: 0 22px 50px rgba(2, 6, 23, 0.48);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #0b1220, #101827);
+      min-height: 100%;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(90, 168, 255, 0.12), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(124, 92, 255, 0.12), transparent 30%),
+        var(--bg);
       color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, select, textarea {
+      font: inherit;
     }
 
     .hidden { display: none !important; }
 
     .login-screen {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      background:
+        radial-gradient(circle at top left, rgba(94, 234, 212, 0.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.14), transparent 30%),
+        var(--bg);
     }
 
     .login-card {
       width: min(100%, 420px);
-      background: rgba(17, 24, 39, 0.9);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 28px;
       box-shadow: var(--shadow);
-      padding: 32px 28px;
+      padding: 30px 28px 26px;
+      backdrop-filter: blur(14px);
+    }
+
+    .login-badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(90,168,255,0.35);
+      background: rgba(90,168,255,0.08);
+      color: #cfe6ff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
     }
 
     .brand {
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      letter-spacing: 0.02em;
+      font-size: clamp(1.9rem, 2.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0 0 10px;
+      letter-spacing: -0.06em;
     }
 
     .subtext {
-      color: var(--muted);
-      margin-bottom: 24px;
-      font-size: 14px;
+      margin: 0 0 26px;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
-    .input-group {
-      margin-bottom: 16px;
+    .input-wrap {
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
       margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 13px;
+      color: var(--text-soft);
+      font-size: 0.8rem;
+      letter-spacing: 0.03em;
     }
 
-    input, select, button, textarea {
+    input, select, textarea {
       width: 100%;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(15, 23, 42, 0.8);
       color: var(--text);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 14px;
-      font-size: 14px;
+      font-size: 0.95rem;
+      transition: 0.2s ease;
     }
 
     textarea {
@@ -90,149 +132,339 @@
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: rgba(79, 140, 255, 0.7);
-      box-shadow: 0 0 0 3px rgba(79,140,255,0.18);
+      border-color: rgba(90, 168, 255, 0.7);
+      box-shadow: 0 0 0 3px rgba(90,168,255,0.15);
+      background: rgba(15, 23, 42, 0.9);
     }
 
     button {
-      cursor: pointer;
       border: none;
+      border-radius: 12px;
+      cursor: pointer;
       transition: 0.2s ease;
+      color: var(--text);
       font-weight: 700;
     }
 
+    button:hover { transform: translateY(-1px); }
+
     .primary-btn {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      padding: 13px 18px;
+      box-shadow: 0 12px 24px rgba(90,168,255,0.35);
     }
 
-    .primary-btn:hover { filter: brightness(1.06); }
-
     .secondary-btn {
-      background: rgba(255,255,255,0.08);
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid var(--line);
+      padding: 10px 14px;
       color: var(--text);
     }
 
     .danger-btn {
-      background: rgba(239,68,68,0.15);
-      color: #ffc1c1;
+      background: rgba(248, 113, 113, 0.12);
+      border: 1px solid rgba(248,113,113,0.28);
+      color: #ffd2d2;
+      padding: 8px 12px;
     }
 
     .success-btn {
-      background: rgba(34,197,94,0.18);
-      color: #b8f6cf;
+      background: rgba(45, 212, 191, 0.12);
+      border: 1px solid rgba(45, 212, 191, 0.34);
+      color: #c7fff9;
+      padding: 8px 12px;
+    }
+
+    .mini-btn {
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      border-radius: 10px;
+      min-width: 80px;
     }
 
     .app-shell {
-      max-width: 1400px;
+      max-width: 1500px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 20px 18px 36px;
+      min-height: 100vh;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 20px;
+      min-height: calc(100vh - 40px);
+    }
+
+    .sidebar {
+      background: rgba(10, 17, 28, 0.85);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px 16px;
+      position: sticky;
+      top: 18px;
+      height: fit-content;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+    }
+
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: white;
+      box-shadow: 0 12px 24px rgba(90,168,255,0.28);
+    }
+
+    .brand-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: var(--text-soft);
+      background: transparent;
+      border: 1px solid transparent;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(90,168,255,0.15), rgba(124,92,255,0.1));
+      border-color: rgba(90,168,255,0.28);
+      color: var(--text);
+    }
+
+    .nav-item:hover {
+      background: rgba(148,163,184,0.04);
+      border-color: var(--line);
+    }
+
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .sidebar-footer {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .main {
+      min-width: 0;
     }
 
     .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: rgba(17,24,39,0.78);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      justify-content: space-between;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 20px;
       padding: 18px 20px;
-      margin-bottom: 22px;
       box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
     .topbar h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      letter-spacing: -0.05em;
     }
 
-    .topbar-right {
+    .topbar-actions {
       display: flex;
-      gap: 12px;
       align-items: center;
+      gap: 12px;
     }
 
-    .user-pill {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
+    .search-box {
+      min-width: min(100%, 220px);
+      background: rgba(148, 163, 184, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(148,163,184,0.06);
+      border: 1px solid var(--line);
       border-radius: 999px;
       padding: 8px 12px;
-      color: var(--muted);
-      font-size: 13px;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      font-weight: 600;
     }
 
-    .grid {
+    .avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--purple));
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      place-items: center;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .content {
+      margin-top: 22px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 18px;
       margin-bottom: 22px;
     }
 
-    .card {
-      background: linear-gradient(180deg, rgba(29,41,64,1), rgba(17,24,39,0.9));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 20px;
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(19,33,53,0.95), rgba(15,23,42,0.9));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px 18px 18px;
       box-shadow: var(--shadow);
     }
 
-    .card .label {
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 10px;
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--purple));
     }
 
-    .card .value {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.04em;
+    .stat-label {
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.7rem;
+      margin-bottom: 14px;
+    }
+
+    .stat-value {
+      font-size: clamp(1.7rem, 2vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+    }
+
+    .stat-trend {
+      margin-top: 12px;
+      color: var(--success);
+      font-size: 0.75rem;
+      font-weight: 600;
     }
 
     .panel {
-      background: rgba(17,24,39,0.82);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--line);
+      border-radius: 20px;
       box-shadow: var(--shadow);
       padding: 20px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
+      backdrop-filter: blur(12px);
     }
 
-    .panel-head {
+    .panel-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .panel h3 {
+    .panel-header h3 {
       margin: 0;
-      font-size: 19px;
+      font-size: 1.08rem;
+      letter-spacing: -0.03em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(90,168,255,0.08);
+      border: 1px solid rgba(90,168,255,0.22);
+      color: #cfe6ff;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      overflow: hidden;
-      border-radius: 12px;
+      min-width: 760px;
     }
 
     th, td {
       text-align: left;
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      font-size: 13px;
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.88rem;
+      vertical-align: middle;
     }
 
     th {
-      color: var(--muted);
-      background: rgba(255,255,255,0.02);
-      font-weight: 600;
-      font-size: 12px;
+      color: var(--text-soft);
+      background: rgba(148,163,184,0.04);
+      font-size: 0.72rem;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    td {
+      color: var(--text);
     }
 
     .table-actions {
@@ -241,64 +473,64 @@
       flex-wrap: wrap;
     }
 
-    .mini-btn {
-      border-radius: 8px;
-      padding: 7px 10px;
-      font-size: 12px;
-      min-width: 80px;
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    .layout-two {
+    .status-active { background: rgba(45,212,191,0.12); color: #bdeee7; }
+    .status-pending { background: rgba(251,191,36,0.12); color: #f8d58b; }
+    .status-suspended { background: rgba(148,163,184,0.12); color: #d7e1ef; }
+    .status-blocked { background: rgba(248,113,113,0.12); color: #ffc7c7; }
+    .status-rejected { background: rgba(248,113,113,0.12); color: #ffc7c7; }
+    .status-approved { background: rgba(45,212,191,0.12); color: #bdeee7; }
+    .status-inactive { background: rgba(148,163,184,0.12); color: #d7e1ef; }
+
+    .two-col {
       display: grid;
-      grid-template-columns: 1.3fr 0.7fr;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.85fr);
+      gap: 22px;
     }
 
-    form .form-grid {
+    .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
     }
 
     .form-actions {
       display: flex;
       justify-content: flex-end;
-      margin-top: 18px;
       gap: 10px;
+      margin-top: 18px;
     }
 
-    .status-badge {
-      display: inline-block;
-      padding: 6px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .settings-list {
+      display: grid;
+      gap: 16px;
     }
-
-    .status-active { background: rgba(34,197,94,0.15); color: #b8f6cf; }
-    .status-pending { background: rgba(245,158,11,0.15); color: #f8d892; }
-    .status-blocked, .status-rejected { background: rgba(239,68,68,0.15); color: #ffc1c1; }
-    .status-approved { background: rgba(34,197,94,0.15); color: #b8f6cf; }
-    .status-suspended { background: rgba(148,163,184,0.15); color: #dfe7f2; }
-
-    .muted { color: var(--muted); }
 
     .toast {
       position: fixed;
       right: 22px;
       bottom: 22px;
-      background: rgba(17,24,39,0.95);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      z-index: 1500;
       padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(90,168,255,0.2);
+      background: rgba(15, 23, 42, 0.94);
       color: var(--text);
       box-shadow: var(--shadow);
       opacity: 0;
-      transform: translateY(12px);
+      transform: translateY(14px);
       transition: 0.25s ease;
-      z-index: 999;
+      font-size: 0.9rem;
+      max-width: 320px;
     }
 
     .toast.show {
@@ -306,176 +538,235 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 860px) {
-      .layout-two { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .two-col { grid-template-columns: 1fr; }
+      .topbar { flex-wrap: wrap; }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell { padding: 16px 12px 28px; }
+      .topbar-actions { width: 100%; }
+      .search-box { flex: 1; min-width: 0; }
+      .login-card { padding: 22px 18px; }
     }
   </style>
 </head>
 <body>
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
-      <div class="brand">Admin Panel</div>
-      <div class="subtext">Masuk ke dashboard investasi</div>
+      <div class="login-badge">Secure access</div>
+      <h2 class="brand">Admin Panel</h2>
+      <p class="subtext">Masuk untuk mengelola pengguna, transaksi, investasi dan pengaturan aplikasi.</p>
 
       <form id="loginForm">
-        <div class="input-group">
+        <div class="input-wrap">
           <label for="email">Email</label>
           <input id="email" type="email" value="admin@example.com" required />
         </div>
 
-        <div class="input-group">
+        <div class="input-wrap">
           <label for="password">Password</label>
           <input id="password" type="password" value="admin123" required />
         </div>
 
-        <button class="primary-btn" type="submit" style="margin-top: 8px;">Login</button>
+        <button class="primary-btn" type="submit">Login</button>
       </form>
     </div>
   </div>
 
   <div id="app" class="app-shell hidden">
-    <header class="topbar">
-      <h1>Dashboard Admin</h1>
-      <div class="topbar-right">
-        <div id="userPill" class="user-pill">Admin</div>
-        <button id="logoutBtn" class="secondary-btn" style="padding: 10px 16px;">Logout</button>
-      </div>
-    </header>
-
-    <section id="summaryGrid" class="grid"></section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h3>Daftar Pengguna</h3>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nama</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Role</th>
-              <th>Saldo</th>
-              <th>Ubah Status</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h3>Transaksi</h3>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>User</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Deskripsi</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="transactionsTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <div class="layout-two">
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Skema Investasi</h3>
-        </div>
-        <div style="overflow-x:auto; margin-bottom: 20px;">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nama</th>
-                <th>Min</th>
-                <th>Bunga</th>
-                <th>Durasi</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="plansTableBody"></tbody>
-          </table>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-mark">A</div>
+          <div class="brand-name">AdminFlow</div>
         </div>
 
-        <form id="planForm">
-          <div class="form-grid">
-            <div>
-              <label>Nama</label>
-              <input id="planName" type="text" placeholder="Nama plan" />
-            </div>
-            <div>
-              <label>Minimum Amount</label>
-              <input id="planMinimumAmount" type="number" step="0.01" placeholder="5000000" />
-            </div>
-            <div>
-              <label>Interest Rate</label>
-              <input id="planInterestRate" type="number" step="0.01" placeholder="12.5" />
-            </div>
-            <div>
-              <label>Duration Days</label>
-              <input id="planDurationDays" type="number" placeholder="30" />
-            </div>
-            <div>
-              <label>Deskripsi</label>
-              <textarea id="planDescription" placeholder="Deskripsi plan"></textarea>
-            </div>
-          </div>
+        <nav class="nav">
+          <button class="nav-item active" type="button">
+            <span class="nav-icon">◉</span>
+            Dashboard
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">👥</span>
+            Users
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">💳</span>
+            Transactions
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">📈</span>
+            Investment Plans
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">⚙</span>
+            Settings
+          </button>
+        </nav>
 
-          <div class="form-actions">
-            <button type="button" id="resetPlanForm" class="secondary-btn">Reset</button>
-            <button type="submit" class="primary-btn">Simpan Plan</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Pengaturan Aplikasi</h3>
+        <div class="sidebar-footer">
+          <button id="logoutBtn" class="secondary-btn" style="width:100%;">Logout</button>
         </div>
+      </aside>
 
-        <form id="settingsForm">
-          <div class="input-group">
-            <label for="siteName">Site Name</label>
-            <input id="siteName" type="text" />
+      <main class="main">
+        <header class="topbar">
+          <h1>Dashboard</h1>
+          <div class="topbar-actions">
+            <div class="search-box">Search dashboard...</div>
+            <div id="userPill" class="user-badge">
+              <span class="avatar">A</span>
+              <span>Admin</span>
+            </div>
           </div>
+        </header>
 
-          <div class="input-group">
-            <label for="currency">Currency</label>
-            <input id="currency" type="text" />
-          </div>
+        <div class="content">
+          <section id="summaryGrid" class="stats-grid"></section>
 
-          <div class="input-group">
-            <label for="timezone">Timezone</label>
-            <input id="timezone" type="text" />
-          </div>
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Users</h3>
+              <span class="pill">Active members</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                    <th>Balance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+          </section>
 
-          <div class="input-group">
-            <label for="maintenanceMode">Maintenance Mode</label>
-            <select id="maintenanceMode">
-              <option value="0">Off</option>
-              <option value="1">On</option>
-            </select>
-          </div>
+          <section class="panel">
+            <div class="panel-header">
+              <h3>Transactions</h3>
+              <span class="pill">Monitoring</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody"></tbody>
+              </table>
+            </div>
+          </section>
 
-          <div class="form-actions">
-            <button type="submit" class="primary-btn">Simpan</button>
+          <div class="two-col">
+            <section class="panel">
+              <div class="panel-header">
+                <h3>Investment plans</h3>
+                <span class="pill">Portfolio</span>
+              </div>
+
+              <div class="table-wrap" style="margin-bottom:18px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Minimum</th>
+                      <th>Rate</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody id="plansTableBody"></tbody>
+                </table>
+              </div>
+
+              <form id="planForm">
+                <div class="form-grid">
+                  <div>
+                    <label>Plan name</label>
+                    <input id="planName" type="text" placeholder="Nama plan" />
+                  </div>
+                  <div>
+                    <label>Minimum amount</label>
+                    <input id="planMinimumAmount" type="number" step="0.01" placeholder="5000000" />
+                  </div>
+                  <div>
+                    <label>Interest rate</label>
+                    <input id="planInterestRate" type="number" step="0.01" placeholder="12.5" />
+                  </div>
+                  <div>
+                    <label>Duration days</label>
+                    <input id="planDurationDays" type="number" placeholder="30" />
+                  </div>
+                </div>
+
+                <div style="margin-top:16px;">
+                  <label>Description</label>
+                  <textarea id="planDescription" placeholder="Deskripsi plan"></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" id="resetPlanForm" class="secondary-btn">Reset</button>
+                  <button type="submit" class="primary-btn" style="width:auto; padding: 11px 16px;">Save plan</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h3>App settings</h3>
+                <span class="pill">System</span>
+              </div>
+
+              <form id="settingsForm" class="settings-list">
+                <div>
+                  <label for="siteName">Site name</label>
+                  <input id="siteName" type="text" />
+                </div>
+
+                <div>
+                  <label for="currency">Currency</label>
+                  <input id="currency" type="text" />
+                </div>
+
+                <div>
+                  <label for="timezone">Timezone</label>
+                  <input id="timezone" type="text" />
+                </div>
+
+                <div>
+                  <label for="maintenanceMode">Maintenance mode</label>
+                  <select id="maintenanceMode">
+                    <option value="0">Off</option>
+                    <option value="1">On</option>
+                  </select>
+                </div>
+
+                <div class="form-actions" style="margin-top:0;">
+                  <button type="submit" class="primary-btn" style="width:auto; padding: 11px 16px;">Save settings</button>
+                </div>
+              </form>
+            </section>
           </div>
-        </form>
-      </section>
+        </div>
+      </main>
     </div>
   </div>
 
@@ -491,13 +782,13 @@
 
     const $ = (selector) => document.querySelector(selector);
 
-    const toast = (msg, type = 'info') => {
+    function toast(msg, type = 'info') {
       const el = $('#toast');
       el.textContent = msg;
-      el.style.borderColor = type === 'error' ? 'rgba(239,68,68,0.6)' : 'rgba(79,140,255,0.6)';
+      el.style.borderColor = type === 'error' ? 'rgba(248, 113, 113, 0.45)' : 'rgba(90, 168, 255, 0.42)';
       el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 2200);
-    };
+      setTimeout(() => el.classList.remove('show'), 2400);
+    }
 
     function renderAuthState() {
       const loggedIn = !!state.token;
@@ -505,25 +796,19 @@
       $('#app').classList.toggle('hidden', !loggedIn);
 
       if (loggedIn) {
-        $('#userPill').textContent = state.user ? state.user.name || state.user.email : 'Admin';
+        const name = state.user ? (state.user.name || state.user.email || 'Admin') : 'Admin';
+        $('#userPill').innerHTML = `<span class="avatar">${(name.charAt(0) || 'A').toUpperCase()}</span><span>${name}</span>`;
       }
     }
 
     async function apiFetch(url, options = {}) {
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      };
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
 
       if (state.token) {
         headers['Authorization'] = `Bearer ${state.token}`;
       }
 
-      const response = await fetch(url, {
-        ...options,
-        headers
-      });
-
+      const response = await fetch(url, { ...options, headers });
       const json = await response.json();
 
       if (!response.ok || (json && json.success === false)) {
@@ -555,9 +840,9 @@
 
         renderAuthState();
         loadAll();
-        toast('Login berhasil');
+        toast('Login successful');
       } catch (error) {
-        toast(error.message || 'Login gagal', 'error');
+        toast(error.message || 'Login failed', 'error');
       }
     }
 
@@ -567,7 +852,7 @@
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
       renderAuthState();
-      toast('Logout berhasil');
+      toast('Logged out');
     }
 
     function formatCurrency(value) {
@@ -581,12 +866,13 @@
 
     function setStatusBadge(value) {
       const normalized = String(value || '').toLowerCase();
-      let className = 'status-pending';
-      if (normalized === 'active' || normalized === 'approved') className = 'status-active';
-      if (normalized === 'suspended') className = 'status-suspended';
-      if (normalized === 'blocked' || normalized === 'rejected') className = 'status-blocked';
-      if (normalized === 'pending') className = 'status-pending';
-      return `<span class="status-badge ${className}">${value || '-'}</span>`;
+      let cls = 'status-pending';
+      if (normalized === 'active' || normalized === 'approved') cls = 'status-active';
+      if (normalized === 'pending') cls = 'status-pending';
+      if (normalized === 'suspended') cls = 'status-suspended';
+      if (normalized === 'blocked' || normalized === 'rejected') cls = 'status-blocked';
+      if (normalized === 'inactive') cls = 'status-inactive';
+      return `<span class="status-badge ${cls}">${value || '-'}</span>`;
     }
 
     function renderSummary(summary = {}) {
@@ -594,15 +880,16 @@
         ['Total Users', summary.total_users ?? 0],
         ['Active Users', summary.active_users ?? 0],
         ['Total Balance', formatCurrency(summary.total_balance ?? 0)],
-        ['Pending Transactions', summary.pending_transactions ?? 0],
-        ['Total Deposit', formatCurrency(summary.total_deposit ?? 0)],
-        ['Total Withdrawal', formatCurrency(summary.total_withdrawal ?? 0)]
+        ['Pending', summary.pending_transactions ?? 0],
+        ['Deposit', formatCurrency(summary.total_deposit ?? 0)],
+        ['Withdrawal', formatCurrency(summary.total_withdrawal ?? 0)]
       ];
 
       $('#summaryGrid').innerHTML = cards.map(([label, value]) => `
-        <div class="card">
-          <div class="label">${label}</div>
-          <div class="value">${value}</div>
+        <div class="stat-card">
+          <div class="stat-label">${label}</div>
+          <div class="stat-value">${value}</div>
+          <div class="stat-trend">+ 12.5% this month</div>
         </div>
       `).join('');
     }
@@ -612,7 +899,7 @@
         const res = await apiFetch('../admin/dashboard');
         renderSummary(res.data.summary || {});
       } catch (error) {
-        toast(error.message || 'Gagal memuat dashboard', 'error');
+        toast(error.message || 'Failed to load dashboard', 'error');
       }
     }
 
@@ -630,7 +917,7 @@
             <td>${user.role || 'user'}</td>
             <td>${formatCurrency(user.balance || 0)}</td>
             <td>
-              <select data-user-id="${user.id}" class="status-select">
+              <select data-user-id="${user.id}" class="status-select" style="width:auto; min-width:110px;">
                 <option value="active" ${user.status === 'active' ? 'selected' : ''}>active</option>
                 <option value="pending" ${user.status === 'pending' ? 'selected' : ''}>pending</option>
                 <option value="suspended" ${user.status === 'suspended' ? 'selected' : ''}>suspended</option>
@@ -650,15 +937,15 @@
                 method: 'PUT',
                 body: JSON.stringify({ user_id: userId, status })
               });
-              toast('Status user berhasil diubah');
+              toast('User status updated');
               loadUsers();
             } catch (error) {
-              toast(error.message || 'Gagal mengubah status', 'error');
+              toast(error.message || 'Failed to update user status', 'error');
             }
           });
         });
       } catch (error) {
-        toast(error.message || 'Gagal memuat pengguna', 'error');
+        toast(error.message || 'Failed to load users', 'error');
       }
     }
 
@@ -699,20 +986,20 @@
                 body: JSON.stringify({
                   transaction_id: transactionId,
                   admin_id: state.user?.id || 1,
-                  reason: action === 'reject' ? 'Ditolak dari admin panel' : ''
+                  reason: action === 'reject' ? 'Rejected from admin panel' : ''
                 })
               });
 
-              toast(action === 'approve' ? 'Transaksi disetujui' : 'Transaksi ditolak');
+              toast(action === 'approve' ? 'Transaction approved' : 'Transaction rejected');
               loadTransactions();
               loadDashboard();
             } catch (error) {
-              toast(error.message || 'Gagal mengubah transaksi', 'error');
+              toast(error.message || 'Failed to update transaction', 'error');
             }
           });
         });
       } catch (error) {
-        toast(error.message || 'Gagal memuat transaksi', 'error');
+        toast(error.message || 'Failed to load transactions', 'error');
       }
     }
 
@@ -727,12 +1014,10 @@
             <td>${plan.name || '-'}</td>
             <td>${formatCurrency(plan.minimum_amount || 0)}</td>
             <td>${Number(plan.interest_rate || 0)}%</td>
-            <td>${plan.duration_days || 0} hari</td>
+            <td>${plan.duration_days || 0} days</td>
             <td>${setStatusBadge(plan.is_active ? 'active' : 'inactive')}</td>
             <td>
-              <div class="table-actions">
-                <button class="mini-btn secondary-btn" data-plan-edit="${plan.id}">Edit</button>
-              </div>
+              <button class="mini-btn secondary-btn" data-plan-edit="${plan.id}">Edit</button>
             </td>
           </tr>
         `).join('');
@@ -749,11 +1034,11 @@
             $('#planInterestRate').value = plan.interest_rate || 0;
             $('#planDurationDays').value = plan.duration_days || 0;
             $('#planDescription').value = plan.description || '';
-            $('#planForm button[type="submit"]').textContent = 'Update Plan';
+            $('.primary-btn[type="submit"]').textContent = 'Update plan';
           });
         });
       } catch (error) {
-        toast(error.message || 'Gagal memuat plan investasi', 'error');
+        toast(error.message || 'Failed to load investment plans', 'error');
       }
     }
 
@@ -768,7 +1053,7 @@
         $('#timezone').value = settings.timezone || 'Asia/Jakarta';
         $('#maintenanceMode').value = settings.maintenance_mode === '1' || settings.maintenance_mode === true ? '1' : '0';
       } catch (error) {
-        toast(error.message || 'Gagal memuat pengaturan', 'error');
+        toast(error.message || 'Failed to load app settings', 'error');
       }
     }
 
@@ -790,18 +1075,18 @@
           method: 'POST',
           body: JSON.stringify(payload)
         });
-        toast('Plan berhasil disimpan');
+        toast('Plan saved successfully');
         resetPlanForm();
         loadPlans();
       } catch (error) {
-        toast(error.message || 'Gagal menyimpan plan', 'error');
+        toast(error.message || 'Failed to save plan', 'error');
       }
     }
 
     function resetPlanForm() {
       state.planEditId = null;
       $('#planForm').reset();
-      $('#planForm button[type="submit"]').textContent = 'Simpan Plan';
+      $('.primary-btn[type="submit"]').textContent = 'Save plan';
     }
 
     async function submitSettings(event) {
@@ -819,9 +1104,9 @@
           method: 'POST',
           body: JSON.stringify(payload)
         });
-        toast('Pengaturan berhasil disimpan');
+        toast('Settings saved successfully');
       } catch (error) {
-        toast(error.message || 'Gagal menyimpan pengaturan', 'error');
+        toast(error.message || 'Failed to save settings', 'error');
       }
     }
 
