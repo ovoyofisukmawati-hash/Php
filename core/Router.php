@@ -73,25 +73,29 @@ final class Router
 
     private function matchPattern(string $route, string $uri): bool
     {
+        $route = trim($route, '/');
+        $uri = trim($uri, '/');
+
         if ($route === $uri) {
             return true;
         }
 
-        $pattern = preg_replace('/\{([^}]+)\}/', '([^/]+)', $route);
+        $pattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '([^/]+)', $route);
         return (bool) preg_match('#^' . $pattern . '$#', $uri);
     }
 
     private function extractParams(string $route, string $uri): array
     {
-        preg_match_all('/\{([^}]+)\}/', $route, $matches);
-        $routeParts = explode('/', $route);
-        $uriParts = explode('/', $uri);
+        $routeParts = explode('/', trim($route, '/'));
+        $uriParts = explode('/', trim($uri, '/'));
         $params = [];
 
-        foreach ($matches[1] as $index => $name) {
-            $params[] = $uriParts[array_search($routeParts[$index], $routeParts) ?? 0] ?? null;
+        foreach ($routeParts as $index => $part) {
+            if (preg_match('/^\{([a-zA-Z0-9_]+)\}$/', $part, $matches)) {
+                $params[$matches[1]] = $uriParts[$index] ?? null;
+            }
         }
 
-        return array_values(array_filter($params, fn ($value) => $value !== null));
+        return array_values($params);
     }
 }
