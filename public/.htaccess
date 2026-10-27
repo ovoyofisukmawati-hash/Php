@@ -1,0 +1,11 @@
+Options -Indexes
+DirectoryIndex index.php
+
+RewriteEngine On
+
+# Serve existing files directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything else to the front controller
+RewriteRule ^ index.php [QSA,L]
