@@ -1,7 +1,5 @@
 <?php
 
-use Core\ErrorHandler;
-use Core\Request;
 use Core\Router;
 
 function registerApiRoutes(Router $router): void
@@ -31,15 +29,4 @@ function registerApiRoutes(Router $router): void
     $router->get('investment/plans', [\App\Controllers\InvestmentController::class, 'plans']);
     $router->post('investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
     $router->get('investment/history', [\App\Controllers\InvestmentController::class, 'history']);
-}
-
-if (PHP_SAPI !== 'cli') {
-    $router = new Router();
-    registerApiRoutes($router);
-
-    try {
-        $router->dispatch(Request::method(), Request::uri());
-    } catch (\Throwable $e) {
-        ErrorHandler::handle($e);
-    }
 }
