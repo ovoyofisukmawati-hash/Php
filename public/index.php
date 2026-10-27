@@ -2,6 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Core\ErrorHandler;
 use Core\Request;
 use Core\Router;
 
@@ -23,12 +24,10 @@ $router->post('auth/two-factor', [\App\Controllers\AuthController::class, 'enabl
 $router->get('admin/dashboard', [\App\Controllers\AdminController::class, 'dashboard']);
 $router->get('admin/users', [\App\Controllers\AdminController::class, 'users']);
 $router->put('admin/users/{id}/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
-$router->post('admin/users/status', [\App\Controllers\AdminController::class, 'updateUserStatus']); // compatibility
+$router->post('admin/users/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
 $router->get('admin/transactions', [\App\Controllers\AdminController::class, 'transactions']);
 $router->post('admin/transactions/{id}/approve', [\App\Controllers\AdminController::class, 'approveTransaction']);
 $router->post('admin/transactions/{id}/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']);
-$router->post('admin/transactions/approve', [\App\Controllers\AdminController::class, 'approveTransaction']); // compatibility
-$router->post('admin/transactions/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']); // compatibility
 $router->get('admin/investment-plans', [\App\Controllers\AdminController::class, 'investmentPlans']);
 $router->post('admin/investment-plans', [\App\Controllers\AdminController::class, 'saveInvestmentPlan']);
 $router->get('admin/settings', [\App\Controllers\AdminController::class, 'settings']);
@@ -39,23 +38,8 @@ $router->get('investment/plans', [\App\Controllers\InvestmentController::class, 
 $router->post('investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
 $router->get('investment/history', [\App\Controllers\InvestmentController::class, 'history']);
 
-// Legacy compatibility routes
-$router->post('api/auth/register', [\App\Controllers\AuthController::class, 'register']);
-$router->post('api/auth/login', [\App\Controllers\AuthController::class, 'login']);
-$router->get('api/auth/profile', [\App\Controllers\AuthController::class, 'profile']);
-$router->post('api/auth/two-factor', [\App\Controllers\AuthController::class, 'enableTwoFactor']);
-$router->get('api/admin/dashboard', [\App\Controllers\AdminController::class, 'dashboard']);
-$router->get('api/admin/users', [\App\Controllers\AdminController::class, 'users']);
-$router->post('api/admin/users/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
-$router->get('api/admin/transactions', [\App\Controllers\AdminController::class, 'transactions']);
-$router->post('api/admin/transactions/approve', [\App\Controllers\AdminController::class, 'approveTransaction']);
-$router->post('api/admin/transactions/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']);
-$router->get('api/admin/investment-plans', [\App\Controllers\AdminController::class, 'investmentPlans']);
-$router->post('api/admin/investment-plans', [\App\Controllers\AdminController::class, 'saveInvestmentPlan']);
-$router->get('api/admin/settings', [\App\Controllers\AdminController::class, 'settings']);
-$router->post('api/admin/settings', [\App\Controllers\AdminController::class, 'saveSettings']);
-$router->get('api/investment/plans', [\App\Controllers\InvestmentController::class, 'plans']);
-$router->post('api/investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
-$router->get('api/investment/history', [\App\Controllers\InvestmentController::class, 'history']);
-
-$router->dispatch(Request::method(), Request::uri());
+try {
+    $router->dispatch(Request::method(), Request::uri());
+} catch (\Throwable $e) {
+    ErrorHandler::handle($e);
+}
