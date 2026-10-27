@@ -1,6 +1,23 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+spl_autoload_register(function (string $class): void {
+    $prefixes = [
+        'App\\' => __DIR__ . '/../app/',
+        'Core\\' => __DIR__ . '/../core/',
+    ];
+
+    foreach ($prefixes as $prefix => $baseDir) {
+        if (str_starts_with($class, $prefix)) {
+            $relativeClass = substr($class, strlen($prefix));
+            $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+        }
+    }
+});
 
 use Core\ErrorHandler;
 use Core\Request;
@@ -14,17 +31,14 @@ $router->get('health', fn () => [
     'timestamp' => date('c'),
 ]);
 
-// Auth routes
 $router->post('auth/register', [\App\Controllers\AuthController::class, 'register']);
 $router->post('auth/login', [\App\Controllers\AuthController::class, 'login']);
 $router->get('auth/profile', [\App\Controllers\AuthController::class, 'profile']);
 $router->post('auth/two-factor', [\App\Controllers\AuthController::class, 'enableTwoFactor']);
 
-// Admin routes
 $router->get('admin/dashboard', [\App\Controllers\AdminController::class, 'dashboard']);
 $router->get('admin/users', [\App\Controllers\AdminController::class, 'users']);
 $router->put('admin/users/{id}/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
-$router->post('admin/users/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
 $router->get('admin/transactions', [\App\Controllers\AdminController::class, 'transactions']);
 $router->post('admin/transactions/{id}/approve', [\App\Controllers\AdminController::class, 'approveTransaction']);
 $router->post('admin/transactions/{id}/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']);
@@ -33,7 +47,6 @@ $router->post('admin/investment-plans', [\App\Controllers\AdminController::class
 $router->get('admin/settings', [\App\Controllers\AdminController::class, 'settings']);
 $router->post('admin/settings', [\App\Controllers\AdminController::class, 'saveSettings']);
 
-// Investment routes
 $router->get('investment/plans', [\App\Controllers\InvestmentController::class, 'plans']);
 $router->post('investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
 $router->get('investment/history', [\App\Controllers\InvestmentController::class, 'history']);

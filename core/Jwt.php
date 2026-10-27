@@ -2,45 +2,60 @@
 
 namespace Core;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use DateTimeImmutable;
-
 final class Jwt
 {
-    private const ALGORITHM = 'HS256';
-
     public static function encode(array $payload, string $secret): string
     {
-        $now = new DateTimeImmutable();
+        $header = self::base64UrlEncode(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+        $payloadEnc = self::base64UrlEncode(json_encode($payload));
+        $signature = hash_hmac('sha256', $header . '.' . $payloadEnc, $secret, true);
 
-        $payload = array_merge([
-            'iat' => $now->getTimestamp(),
-            'nbf' => $now->getTimestamp(),
-            'exp' => $now->modify('+7 days')->getTimestamp(),
-        ], $payload);
-
-        return JWT::encode($payload, $secret, self::ALGORITHM);
+        return $header . '.' . $payloadEnc . '.' . self::base64UrlEncode($signature);
     }
 
-    public static function decode(string $token, string $secret): array
+    public static function decode(string $token, string $secret): ?array
     {
-        return (array) JWT::decode($token, new Key($secret, self::ALGORITHM));
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        [$header, $payload, $signature] = $parts;
+        $expected = hash_hmac('sha256', $header . '.' . $payload, $secret, true);
+        $expectedEnc = self::base64UrlEncode($expected);
+
+        if (!hash_equals($expectedEnc, $signature)) {
+            return null;
+        }
+
+        $decoded = json_decode(self::base64UrlDecode($payload), true);
+        return is_array($decoded) ? $decoded : null;
     }
 
     public static function getBearerToken(): ?string
     {
         $headers = getallheaders();
-        $authorization = $headers['Authorization'] ?? null;
+        $authorization = $headers['Authorization'] ?? '';
 
-        if (!$authorization) {
+        if (!preg_match('/Bearer\s+(.*)$/i', $authorization, $matches)) {
             return null;
         }
 
-        if (preg_match('/Bearer\s+(.*)$/i', $authorization, $matches)) {
-            return $matches[1];
+        return $matches[1];
+    }
+
+    private static function base64UrlEncode(string $value): string
+    {
+        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    private static function base64UrlDecode(string $value): string
+    {
+        $padding = strlen($value) % 4;
+        if ($padding > 0) {
+            $value .= str_repeat('=', 4 - $padding);
         }
 
-        return null;
+        return base64_decode(strtr($value, '-_', '+/'));
     }
 }

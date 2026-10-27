@@ -15,14 +15,9 @@ final class AuthMiddleware
                 throw new HttpException(401, 'Token tidak ditemukan.');
             }
 
-            try {
-                $claims = Jwt::decode($token, $secret);
-            } catch (\Throwable $e) {
+            $claims = Jwt::decode($token, $secret);
+            if (!$claims || !isset($claims['user_id'])) {
                 throw new HttpException(401, 'Token tidak valid atau sudah kedaluwarsa.');
-            }
-
-            if (!isset($claims['user_id'])) {
-                throw new HttpException(401, 'Token tidak memuat user_id.');
             }
 
             $request['user'] = [

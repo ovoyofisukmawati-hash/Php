@@ -3,8 +3,7 @@
   "description": "Backend PHP untuk aplikasi investasi, akun, admin, dan transaksi.",
   "type": "project",
   "require": {
-    "php": ">=8.1",
-    "firebase/php-jwt": "^6.10"
+    "php": ">=8.1"
   },
   "autoload": {
     "psr-4": {
