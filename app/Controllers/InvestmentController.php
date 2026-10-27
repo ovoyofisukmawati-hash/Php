@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Exceptions\HttpException;
 use App\Models\InvestmentPlanModel;
 use App\Models\TransactionModel;
 use Core\BaseController;
 use Core\Request;
+use Core\Validator;
 
 class InvestmentController extends BaseController
 {
@@ -15,14 +17,12 @@ class InvestmentController extends BaseController
         return $this->success(['plans' => $model->all()], 'Skema investasi berhasil dimuat.');
     }
 
-    public function invest(): array
+    public function invest(array $input = []): array
     {
-        $payload = Request::input();
-
-        foreach (['user_id', 'plan_id', 'amount'] as $field) {
-            if (!isset($payload[$field]) || trim((string) $payload[$field]) === '') {
-                return $this->error("Field {$field} wajib diisi.");
-            }
+        $payload = $input ?: Request::input();
+        $errors = Validator::required($payload, ['user_id', 'plan_id', 'amount']);
+        if ($errors) {
+            throw new HttpException(422, 'Validasi gagal.', $errors);
         }
 
         $transactionModel = new TransactionModel();
@@ -42,7 +42,7 @@ class InvestmentController extends BaseController
     {
         $userId = (int) ($_GET['user_id'] ?? 0);
         if ($userId <= 0) {
-            return $this->error('user_id wajib diisi.');
+            throw new HttpException(400, 'user_id wajib diisi.');
         }
 
         $db = new \PDO(

@@ -10,21 +10,21 @@ final class ErrorHandler
     {
         if ($e instanceof HttpException) {
             http_response_code($e->statusCode);
-            echo json_encode([
+            Response::json([
                 'success' => false,
                 'message' => $e->message,
                 'details' => $e->details,
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            ], $e->statusCode);
             return;
         }
 
-        $debug = getenv('APP_DEBUG') === 'true' || getenv('APP_DEBUG') === '1';
+        $debug = getenv('APP_DEBUG') === '1' || getenv('APP_DEBUG') === 'true';
 
         http_response_code(500);
-        echo json_encode([
+        Response::json([
             'success' => false,
             'message' => 'Terjadi kesalahan pada server.',
             'details' => $debug ? [$e->getMessage()] : [],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        ], 500);
     }
 }

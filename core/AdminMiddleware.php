@@ -10,7 +10,6 @@ final class AdminMiddleware
     {
         return function (array $request, callable $next) use ($secret): mixed {
             $token = Jwt::getBearerToken();
-
             if (!$token) {
                 throw new HttpException(401, 'Token tidak ditemukan.');
             }

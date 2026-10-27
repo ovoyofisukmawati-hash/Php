@@ -17,9 +17,10 @@ class SettingsModel
     public function getAll(): array
     {
         $stmt = $this->db->query('SELECT setting_key, setting_value FROM app_settings');
-        $settings = [];
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($stmt->fetchAll() as $row) {
+        $settings = [];
+        foreach ($rows as $row) {
             $settings[$row['setting_key']] = $row['setting_value'];
         }
 

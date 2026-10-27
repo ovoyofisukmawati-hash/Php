@@ -4,7 +4,7 @@ namespace Core;
 
 abstract class BaseController
 {
-    protected function success(array $data = [], string $message = 'Success', int $status = 200): array
+    protected function success(array $data = [], string $message = 'Success'): array
     {
         return [
             'success' => true,
@@ -13,13 +13,13 @@ abstract class BaseController
         ];
     }
 
-    protected function error(string $message, int $status = 400, array $details = []): array
+    protected function error(string $message, int $statusCode = 400, array $details = []): array
     {
         return [
             'success' => false,
             'message' => $message,
             'details' => $details,
-            'status' => $status,
+            'status' => $statusCode,
         ];
     }
 }

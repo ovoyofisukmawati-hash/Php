@@ -48,11 +48,13 @@ final class Router
             }
         }
 
-        Response::error('Route not found', 404);
+        throw new \RuntimeException('Route not found', 404);
     }
 
     private function callHandler(callable|array $handler, array $params = []): void
     {
+        $result = null;
+
         if (is_array($handler)) {
             [$controller, $method] = $handler;
             $instance = new $controller();
@@ -92,10 +94,10 @@ final class Router
 
         foreach ($routeParts as $index => $part) {
             if (preg_match('/^\{([a-zA-Z0-9_]+)\}$/', $part, $matches)) {
-                $params[$matches[1]] = $uriParts[$index] ?? null;
+                $params[] = $uriParts[$index] ?? null;
             }
         }
 
-        return array_values($params);
+        return array_values(array_filter($params, fn ($value) => $value !== null));
     }
 }

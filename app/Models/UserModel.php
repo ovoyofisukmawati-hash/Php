@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Core\Database;
 use PDO;
-use PDOException;
 
 class UserModel
 {
@@ -19,33 +18,33 @@ class UserModel
     {
         $stmt = $this->db->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
         $stmt->execute([':email' => strtolower(trim($email))]);
-
-        $user = $stmt->fetch();
-        return $user ?: null;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
     }
 
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $id]);
-
-        $user = $stmt->fetch();
-        return $user ?: null;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
     }
 
-    public function create(array $payload): array
+    public function create(array $payload): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO users (name, email, password_hash, status, created_at) VALUES (:name, :email, :password_hash, :status, NOW())'
+            'INSERT INTO users (name, email, password_hash, status, role, created_at) VALUES (:name, :email, :password_hash, :status, :role, NOW())'
         );
+
         $stmt->execute([
             ':name' => trim((string) $payload['name']),
             ':email' => strtolower(trim((string) $payload['email'])),
             ':password_hash' => password_hash((string) $payload['password'], PASSWORD_BCRYPT),
             ':status' => $payload['status'] ?? 'active',
+            ':role' => $payload['role'] ?? 'user',
         ]);
 
-        $userId = $this->db->lastInsertId();
+        $userId = (int) $this->db->lastInsertId();
 
         $accountStmt = $this->db->prepare(
             'INSERT INTO user_accounts (user_id, balance, currency, created_at) VALUES (:user_id, 0, :currency, NOW())'
@@ -55,7 +54,7 @@ class UserModel
             ':currency' => $payload['currency'] ?? 'IDR',
         ]);
 
-        return ['id' => (int) $userId];
+        return $userId;
     }
 
     public function listAll(): array
@@ -63,8 +62,7 @@ class UserModel
         $stmt = $this->db->query(
             'SELECT u.*, ua.balance FROM users u LEFT JOIN user_accounts ua ON ua.user_id = u.id ORDER BY u.created_at DESC'
         );
-
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function updateStatus(int $userId, string $status): bool

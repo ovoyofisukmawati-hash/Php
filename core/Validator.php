@@ -27,23 +27,12 @@ final class Validator
         $errors = [];
 
         foreach ($fields as $field) {
-            if (array_key_exists($field, $data) && (!is_numeric($data[$field]) || $data[$field] === '')) {
+            if (array_key_exists($field, $data) && (!is_numeric($data[$field]) || (string) $data[$field] === '')) {
                 $errors[$field] = "Field {$field} harus berupa angka.";
             }
         }
 
         return $errors;
-    }
-
-    public static function in(array $data, string $field, array $allowed): ?string
-    {
-        if (!array_key_exists($field, $data)) {
-            return null;
-        }
-
-        return in_array($data[$field], $allowed, true)
-            ? null
-            : "Field {$field} harus salah satu dari: " . implode(', ', $allowed) . ".";
     }
 
     public static function min(array $data, string $field, float $min): ?string

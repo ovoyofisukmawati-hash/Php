@@ -1,23 +1,6 @@
 <?php
 
-spl_autoload_register(function (string $class): void {
-    $prefixes = [
-        'App\\' => __DIR__ . '/../app/',
-        'Core\\' => __DIR__ . '/../core/',
-    ];
-
-    foreach ($prefixes as $prefix => $baseDir) {
-        if (str_starts_with($class, $prefix)) {
-            $relativeClass = substr($class, strlen($prefix));
-            $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-
-            if (file_exists($file)) {
-                require $file;
-                return;
-            }
-        }
-    }
-});
+require __DIR__ . '/../vendor/autoload.php';
 
 use Core\ErrorHandler;
 use Core\Request;

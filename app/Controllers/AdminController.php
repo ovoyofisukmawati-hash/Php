@@ -2,12 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Exceptions\HttpException;
 use App\Models\InvestmentPlanModel;
 use App\Models\SettingsModel;
 use App\Models\TransactionModel;
 use App\Models\UserModel;
 use Core\BaseController;
 use Core\Request;
+use Core\Validator;
 
 class AdminController extends BaseController
 {
@@ -27,7 +29,7 @@ class AdminController extends BaseController
             'total_withdrawal' => (float) $db->query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'withdrawal' AND status = 'approved'")->fetchColumn(),
             'pending_transactions' => (int) $db->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending'")->fetchColumn(),
             'active_investment_plans' => (int) $db->query("SELECT COUNT(*) FROM investment_plans WHERE is_active = 1")->fetchColumn(),
-            'total_referrals' => (float) $db->query('SELECT COALESCE(SUM(amount), 0) FROM referral_commissions')->fetchColumn(),
+            'total_referral_commissions' => (float) $db->query('SELECT COALESCE(SUM(amount), 0) FROM referral_commissions')->fetchColumn(),
         ];
 
         $recentTransactions = $db->query("SELECT * FROM transactions ORDER BY created_at DESC LIMIT 10")->fetchAll();
@@ -46,21 +48,26 @@ class AdminController extends BaseController
         return $this->success(['users' => $userModel->listAll()], 'Daftar pengguna berhasil dimuat.');
     }
 
-    public function updateUserStatus(): array
+    public function updateUserStatus(array $input = []): array
     {
-        $payload = Request::input();
-        $userId = (int) ($payload['user_id'] ?? 0);
-        $status = trim((string) ($payload['status'] ?? ''));
+        $payload = $input ?: Request::input();
+        $errors = Validator::required($payload, ['user_id', 'status']);
+        if ($errors) {
+            throw new HttpException(422, 'Validasi gagal.', $errors);
+        }
 
-        if ($userId <= 0 || $status === '') {
-            return $this->error('user_id dan status wajib diisi.');
+        $userId = (int) $payload['user_id'];
+        $status = trim((string) $payload['status']);
+        $allowed = ['active', 'suspended', 'blocked', 'pending'];
+
+        if (!in_array($status, $allowed, true)) {
+            throw new HttpException(422, 'Status user tidak valid.', ['status' => 'Status harus salah satu dari: ' . implode(', ', $allowed)]);
         }
 
         $userModel = new UserModel();
         $updated = $userModel->updateStatus($userId, $status);
-
         if (!$updated) {
-            return $this->error('Status user gagal diubah.');
+            throw new HttpException(404, 'User tidak ditemukan atau status gagal diubah.');
         }
 
         return $this->success([], 'Status user berhasil diubah.');
@@ -73,42 +80,42 @@ class AdminController extends BaseController
         return $this->success(['transactions' => $model->listAll($type !== '' ? $type : null)], 'Daftar transaksi berhasil dimuat.');
     }
 
-    public function approveTransaction(): array
+    public function approveTransaction(array $input = []): array
     {
-        $payload = Request::input();
-        $transactionId = (int) ($payload['transaction_id'] ?? 0);
-        $adminId = (int) ($payload['admin_id'] ?? 0);
-
-        if ($transactionId <= 0 || $adminId <= 0) {
-            return $this->error('transaction_id dan admin_id wajib diisi.');
+        $payload = $input ?: Request::input();
+        $errors = Validator::required($payload, ['transaction_id', 'admin_id']);
+        if ($errors) {
+            throw new HttpException(422, 'Validasi gagal.', $errors);
         }
+
+        $transactionId = (int) $payload['transaction_id'];
+        $adminId = (int) $payload['admin_id'];
 
         $model = new TransactionModel();
         $approved = $model->approve($transactionId, $adminId);
-
         if (!$approved) {
-            return $this->error('Transaksi tidak ditemukan atau sudah diproses.');
+            throw new HttpException(404, 'Transaksi tidak ditemukan atau sudah diproses.');
         }
 
         return $this->success([], 'Transaksi berhasil disetujui.');
     }
 
-    public function rejectTransaction(): array
+    public function rejectTransaction(array $input = []): array
     {
-        $payload = Request::input();
-        $transactionId = (int) ($payload['transaction_id'] ?? 0);
-        $adminId = (int) ($payload['admin_id'] ?? 0);
-        $reason = trim((string) ($payload['reason'] ?? ''));
-
-        if ($transactionId <= 0 || $adminId <= 0) {
-            return $this->error('transaction_id dan admin_id wajib diisi.');
+        $payload = $input ?: Request::input();
+        $errors = Validator::required($payload, ['transaction_id', 'admin_id']);
+        if ($errors) {
+            throw new HttpException(422, 'Validasi gagal.', $errors);
         }
+
+        $transactionId = (int) $payload['transaction_id'];
+        $adminId = (int) $payload['admin_id'];
+        $reason = trim((string) ($payload['reason'] ?? ''));
 
         $model = new TransactionModel();
         $rejected = $model->reject($transactionId, $adminId, $reason);
-
         if (!$rejected) {
-            return $this->error('Transaksi tidak ditemukan atau sudah diproses.');
+            throw new HttpException(404, 'Transaksi tidak ditemukan atau sudah diproses.');
         }
 
         return $this->success([], 'Transaksi berhasil ditolak.');
@@ -120,22 +127,20 @@ class AdminController extends BaseController
         return $this->success(['plans' => $model->all()], 'Daftar skema investasi berhasil dimuat.');
     }
 
-    public function saveInvestmentPlan(): array
+    public function saveInvestmentPlan(array $input = []): array
     {
-        $payload = Request::input();
-        $model = new InvestmentPlanModel();
-
-        foreach (['name', 'minimum_amount', 'interest_rate', 'duration_days'] as $field) {
-            if (!isset($payload[$field]) || trim((string) $payload[$field]) === '') {
-                return $this->error("Field {$field} wajib diisi.");
-            }
+        $payload = $input ?: Request::input();
+        $errors = Validator::required($payload, ['name', 'minimum_amount', 'interest_rate', 'duration_days']);
+        if ($errors) {
+            throw new HttpException(422, 'Validasi gagal.', $errors);
         }
 
+        $model = new InvestmentPlanModel();
         $id = isset($payload['id']) ? (int) $payload['id'] : 0;
-        $ok = $id > 0 ? $model->update($id, $payload) : $model->create($payload);
+        $saved = $id > 0 ? $model->update($id, $payload) : $model->create($payload);
 
-        if (!$ok) {
-            return $this->error('Skema investasi gagal disimpan.');
+        if (!$saved) {
+            throw new HttpException(500, 'Skema investasi gagal disimpan.');
         }
 
         return $this->success([], $id > 0 ? 'Skema investasi berhasil diperbarui.' : 'Skema investasi berhasil dibuat.');
@@ -143,20 +148,19 @@ class AdminController extends BaseController
 
     public function settings(): array
     {
-        $model = new SettingsModel();
-        return $this->success(['settings' => $model->getAll()], 'Pengaturan aplikasi berhasil dimuat.');
+        $settingsModel = new SettingsModel();
+        return $this->success(['settings' => $settingsModel->getAll()], 'Pengaturan aplikasi berhasil dimuat.');
     }
 
-    public function saveSettings(): array
+    public function saveSettings(array $input = []): array
     {
-        $payload = Request::input();
-
+        $payload = $input ?: Request::input();
         if (!isset($payload['site_name']) || trim((string) $payload['site_name']) === '') {
-            return $this->error('site_name wajib diisi.');
+            throw new HttpException(422, 'site_name wajib diisi.');
         }
 
-        $model = new SettingsModel();
-        $model->update($payload);
+        $settingsModel = new SettingsModel();
+        $settingsModel->update($payload);
 
         return $this->success([], 'Pengaturan aplikasi berhasil disimpan.');
     }

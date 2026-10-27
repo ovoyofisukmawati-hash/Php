@@ -2,7 +2,7 @@
 
 namespace Core;
 
-class Request
+final class Request
 {
     public static function method(): string
     {
@@ -12,33 +12,26 @@ class Request
     public static function uri(): string
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        $uri = parse_url($uri, PHP_URL_PATH) ?? '/';
-
-        return '/' . trim($uri, '/');
+        $parsed = parse_url($uri, PHP_URL_PATH) ?? '/';
+        return '/' . trim($parsed, '/');
     }
 
     public static function input(): array
     {
-        $raw = file_get_contents('php://input');
+        $content = file_get_contents('php://input');
 
-        if ($raw === false || $raw === '') {
-            return $_POST ?? [];
+        if ($content !== false && trim($content) !== '') {
+            $json = json_decode($content, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+                return $json;
+            }
         }
 
-        $json = json_decode($raw, true);
-
-        return is_array($json) ? $json : ($_POST ?? []);
+        return $_POST ?? [];
     }
 
     public static function query(): array
     {
         return $_GET ?? [];
-    }
-
-    public static function header(string $key): ?string
-    {
-        $key = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-
-        return $_SERVER[$key] ?? null;
     }
 }

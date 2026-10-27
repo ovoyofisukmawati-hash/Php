@@ -17,7 +17,7 @@ class InvestmentPlanModel
     public function all(): array
     {
         $stmt = $this->db->query('SELECT * FROM investment_plans ORDER BY created_at DESC');
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function create(array $payload): bool
