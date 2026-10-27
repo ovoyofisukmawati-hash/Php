@@ -1,41 +1,32 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-
-use Core\Request;
-use Core\Response;
 use Core\Router;
 
-$router = new Router();
-
-$router->get('health', function () {
-    return [
+function registerApiRoutes(Router $router): void
+{
+    $router->get('health', fn () => [
         'success' => true,
         'message' => 'Backend is healthy',
         'timestamp' => date('c'),
-    ];
-});
+    ]);
 
-$router->post('api/auth/register', [\App\Controllers\AuthController::class, 'register']);
-$router->post('api/auth/login', [\App\Controllers\AuthController::class, 'login']);
-$router->get('api/auth/profile', [\App\Controllers\AuthController::class, 'profile']);
-$router->post('api/auth/two-factor', [\App\Controllers\AuthController::class, 'enableTwoFactor']);
+    $router->post('auth/register', [\App\Controllers\AuthController::class, 'register']);
+    $router->post('auth/login', [\App\Controllers\AuthController::class, 'login']);
+    $router->get('auth/profile', [\App\Controllers\AuthController::class, 'profile']);
+    $router->post('auth/two-factor', [\App\Controllers\AuthController::class, 'enableTwoFactor']);
 
-$router->get('api/admin/dashboard', [\App\Controllers\AdminController::class, 'dashboard']);
-$router->get('api/admin/users', [\App\Controllers\AdminController::class, 'users']);
-$router->post('api/admin/users/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
-$router->get('api/admin/transactions', [\App\Controllers\AdminController::class, 'transactions']);
-$router->post('api/admin/transactions/approve', [\App\Controllers\AdminController::class, 'approveTransaction']);
-$router->post('api/admin/transactions/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']);
-$router->get('api/admin/investment-plans', [\App\Controllers\AdminController::class, 'investmentPlans']);
-$router->post('api/admin/investment-plans', [\App\Controllers\AdminController::class, 'saveInvestmentPlan']);
-$router->get('api/admin/settings', [\App\Controllers\AdminController::class, 'settings']);
-$router->post('api/admin/settings', [\App\Controllers\AdminController::class, 'saveSettings']);
+    $router->get('admin/dashboard', [\App\Controllers\AdminController::class, 'dashboard']);
+    $router->get('admin/users', [\App\Controllers\AdminController::class, 'users']);
+    $router->put('admin/users/{id}/status', [\App\Controllers\AdminController::class, 'updateUserStatus']);
+    $router->get('admin/transactions', [\App\Controllers\AdminController::class, 'transactions']);
+    $router->post('admin/transactions/{id}/approve', [\App\Controllers\AdminController::class, 'approveTransaction']);
+    $router->post('admin/transactions/{id}/reject', [\App\Controllers\AdminController::class, 'rejectTransaction']);
+    $router->get('admin/investment-plans', [\App\Controllers\AdminController::class, 'investmentPlans']);
+    $router->post('admin/investment-plans', [\App\Controllers\AdminController::class, 'saveInvestmentPlan']);
+    $router->get('admin/settings', [\App\Controllers\AdminController::class, 'settings']);
+    $router->post('admin/settings', [\App\Controllers\AdminController::class, 'saveSettings']);
 
-$router->get('api/investment/plans', [\App\Controllers\InvestmentController::class, 'plans']);
-$router->post('api/investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
-$router->get('api/investment/history', [\App\Controllers\InvestmentController::class, 'history']);
-
-$method = Request::method();
-$uri = Request::uri();
-$router->dispatch($method, $uri);
+    $router->get('investment/plans', [\App\Controllers\InvestmentController::class, 'plans']);
+    $router->post('investment/invest', [\App\Controllers\InvestmentController::class, 'invest']);
+    $router->get('investment/history', [\App\Controllers\InvestmentController::class, 'history']);
+}

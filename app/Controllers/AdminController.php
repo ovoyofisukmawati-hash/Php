@@ -8,6 +8,7 @@ use App\Models\SettingsModel;
 use App\Models\TransactionModel;
 use App\Models\UserModel;
 use Core\BaseController;
+use Core\Database;
 use Core\Request;
 use Core\Validator;
 
@@ -15,11 +16,7 @@ class AdminController extends BaseController
 {
     public function dashboard(): array
     {
-        $db = new \PDO(
-            'mysql:host=' . getenv('DB_HOST') ?: '127.0.0.1' . ';dbname=' . getenv('DB_DATABASE') ?: 'php_app' . ';charset=utf8mb4',
-            getenv('DB_USERNAME') ?: 'root',
-            getenv('DB_PASSWORD') ?: ''
-        );
+        $db = Database::getInstance()->connection();
 
         $summary = [
             'total_users' => (int) $db->query('SELECT COUNT(*) FROM users')->fetchColumn(),
